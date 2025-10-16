@@ -40,7 +40,10 @@ export const env = createEnv({
     DATABASE_URL: normalize(process.env.DATABASE_URL),
     NODE_ENV: normalize(process.env.NODE_ENV),
     BETTER_AUTH_SECRET: normalize(process.env.BETTER_AUTH_SECRET),
-    BETTER_AUTH_URL: normalize(process.env.BETTER_AUTH_URL),
+    // BETTER_AUTH_URL is required for production; provide a safe development fallback
+    BETTER_AUTH_URL: normalize(
+      process.env.BETTER_AUTH_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3055' : undefined)
+    ),
     POLAR_ACCESS_TOKEN: normalize(process.env.POLAR_ACCESS_TOKEN),
     POLAR_WEBHOOK_SECRET: normalize(process.env.POLAR_WEBHOOK_SECRET),
     IMAGEKIT_PRIVATE_KEY: normalize(process.env.IMAGEKIT_PRIVATE_KEY),
