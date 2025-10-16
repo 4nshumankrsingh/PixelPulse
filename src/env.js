@@ -21,10 +21,8 @@ export const env = createEnv({
     DATABASE_URL: z.string().url(),
     BETTER_AUTH_SECRET: z.string(),
     BETTER_AUTH_URL: z.preprocess((v) => {
-      // normalize value first
       const s = normalize(v);
       if (!s) return s;
-      // if there's no scheme, assume https for production-like values
       if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(s)) {
         return `https://${s}`;
       }
@@ -42,38 +40,26 @@ export const env = createEnv({
 
   client: {
     NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT: z.string().url(),
+    NEXT_PUBLIC_BETTER_AUTH_URL: z.string().url(),
+    NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY: z.string(),
   },
 
   runtimeEnv: {
-    // Server variables - map to regular process.env (normalized)
+    // Server variables
     DATABASE_URL: normalize(process.env.DATABASE_URL),
     NODE_ENV: normalize(process.env.NODE_ENV),
     BETTER_AUTH_SECRET: normalize(process.env.BETTER_AUTH_SECRET),
-    // BETTER_AUTH_URL is required for production; provide a safe development fallback
-    // Ensure the runtime value always includes a scheme so downstream libs (BetterAuth) get a valid base URL
-    BETTER_AUTH_URL: (() => {
-      const raw = process.env.BETTER_AUTH_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3055' : undefined);
-      const s = normalize(raw);
-      if (!s) return undefined;
-      if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(s)) return `https://${s}`;
-      return s;
-    })(),
+    BETTER_AUTH_URL: normalize(process.env.BETTER_AUTH_URL),
     POLAR_ACCESS_TOKEN: normalize(process.env.POLAR_ACCESS_TOKEN),
     POLAR_WEBHOOK_SECRET: normalize(process.env.POLAR_WEBHOOK_SECRET),
     IMAGEKIT_PRIVATE_KEY: normalize(process.env.IMAGEKIT_PRIVATE_KEY),
-    // Allow build/env VARs to be provided as NEXT_PUBLIC_* (common on Vercel)
-    IMAGEKIT_URL_ENDPOINT: normalize(
-      process.env.IMAGEKIT_URL_ENDPOINT || process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT
-    ),
+    IMAGEKIT_URL_ENDPOINT: normalize(process.env.IMAGEKIT_URL_ENDPOINT),
+    IMAGEKIT_PUBLIC_KEY: normalize(process.env.IMAGEKIT_PUBLIC_KEY),
 
-    // Client variables - map to regular process.env (normalized). Allow fallback to server var.
-    NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT: normalize(
-      process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT || process.env.IMAGEKIT_URL_ENDPOINT
-    ),
-    // Fallback: prefer server var but fall back to NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY
-    IMAGEKIT_PUBLIC_KEY: normalize(
-      process.env.IMAGEKIT_PUBLIC_KEY || process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY
-    ),
+    // Client variables
+    NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT: normalize(process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT),
+    NEXT_PUBLIC_BETTER_AUTH_URL: normalize(process.env.NEXT_PUBLIC_BETTER_AUTH_URL),
+    NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY: normalize(process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY),
   },
   
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

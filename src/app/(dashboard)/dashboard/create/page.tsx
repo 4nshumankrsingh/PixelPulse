@@ -20,13 +20,13 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { toast } from "sonner";
-import { env } from "~/env";
 import { upload, Image as ImageKitImage } from "@imagekit/next";
 import {
   createProject,
   getUserProjects,
   deductCredits,
 } from "~/actions/projects";
+import { clientConfig } from "~/lib/client-config";
 
 interface UploadedImage {
   fileId: string;
@@ -331,19 +331,11 @@ export default function CreatePage() {
     const mainImage = document.querySelector('img[width="800"][height="600"]');
     const url =
       (mainImage as HTMLImageElement)?.src ??
-      `${env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT}${uploadedImage.filePath}`;
+      `${clientConfig.imagekitUrlEndpoint}${uploadedImage.filePath}`;
 
     window.open(url, "_blank");
     toast.success("Download started!");
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
 
   if (isLoading) {
     return (
@@ -732,7 +724,7 @@ export default function CreatePage() {
                           </div>
                         )}
                         <ImageKitImage
-                          urlEndpoint={env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT}
+                          urlEndpoint={clientConfig.imagekitUrlEndpoint}
                           src={uploadedImage.filePath}
                           alt={uploadedImage.name}
                           width={800}
@@ -803,7 +795,7 @@ export default function CreatePage() {
                       {/* Main image */}
                       <div className="relative h-full w-full overflow-hidden">
                         <ImageKitImage
-                          urlEndpoint={env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT}
+                          urlEndpoint={clientConfig.imagekitUrlEndpoint}
                           src={project.filePath}
                           alt={project.name ?? "Project"}
                           width={300}
