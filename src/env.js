@@ -27,13 +27,18 @@ export const env = createEnv({
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
     BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
     POLAR_ACCESS_TOKEN: process.env.POLAR_ACCESS_TOKEN,
-    POLAR_WEBHOOK_SECRET: process.env.POLAR_WEBHOOK_SECRET,
-    IMAGEKIT_PUBLIC_KEY: process.env.IMAGEKIT_PUBLIC_KEY, 
-    IMAGEKIT_PRIVATE_KEY: process.env.IMAGEKIT_PRIVATE_KEY,
-    IMAGEKIT_URL_ENDPOINT: process.env.IMAGEKIT_URL_ENDPOINT, 
+  POLAR_WEBHOOK_SECRET: process.env.POLAR_WEBHOOK_SECRET,
+  IMAGEKIT_PRIVATE_KEY: process.env.IMAGEKIT_PRIVATE_KEY,
+    // Allow build/env VARs to be provided as NEXT_PUBLIC_* (common on Vercel)
+    IMAGEKIT_URL_ENDPOINT:
+      process.env.IMAGEKIT_URL_ENDPOINT || process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT,
     
     // Client variables - map to regular process.env
     NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT: process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT,
+    // Fallback: if only server-side IMAGEKIT_PUBLIC_KEY is missing but a NEXT_PUBLIC_* exists,
+    // prefer the server var (IMAGEKIT_PUBLIC_KEY) but fall back to NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY
+    IMAGEKIT_PUBLIC_KEY:
+      process.env.IMAGEKIT_PUBLIC_KEY || process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY,
   },
   
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
