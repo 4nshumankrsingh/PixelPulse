@@ -20,7 +20,16 @@ export const env = createEnv({
   server: {
     DATABASE_URL: z.string().url(),
     BETTER_AUTH_SECRET: z.string(),
-    BETTER_AUTH_URL: z.string().url(),
+    BETTER_AUTH_URL: z.preprocess((v) => {
+      // normalize value first
+      const s = normalize(v);
+      if (!s) return s;
+      // if there's no scheme, assume https for production-like values
+      if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(s)) {
+        return `https://${s}`;
+      }
+      return s;
+    }, z.string().url()),
     POLAR_ACCESS_TOKEN: z.string(),
     POLAR_WEBHOOK_SECRET: z.string(),
     IMAGEKIT_PRIVATE_KEY: z.string(),
