@@ -49,8 +49,10 @@ export const env = createEnv({
       process.env.IMAGEKIT_URL_ENDPOINT || process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT
     ),
 
-    // Client variables - map to regular process.env (normalized)
-    NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT: normalize(process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT),
+    // Client variables - map to regular process.env (normalized). Allow fallback to server var.
+    NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT: normalize(
+      process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT || process.env.IMAGEKIT_URL_ENDPOINT
+    ),
     // Fallback: prefer server var but fall back to NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY
     IMAGEKIT_PUBLIC_KEY: normalize(
       process.env.IMAGEKIT_PUBLIC_KEY || process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY
