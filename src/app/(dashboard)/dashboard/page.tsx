@@ -4,14 +4,14 @@ import { RedirectToSignIn, SignedIn } from "@daveyplate/better-auth-ui";
 import {
   Loader2,
   Image as ImageIcon,
-  Camera,
+  Sparkles,
   Users,
   Calendar,
   TrendingUp,
+  Camera,
   Star,
   ArrowRight,
   Plus,
-  Zap,
 } from "lucide-react";
 import { authClient } from "~/lib/auth-client";
 import { useEffect, useState } from "react";
@@ -112,7 +112,7 @@ export default function DashboardPage() {
               Welcome back{user?.name ? `, ${user.name}` : ""}!
             </h1>
             <p className="text-muted-foreground text-base sm:text-lg">
-              Here&apos;s an overview of your PixelPulse workspace
+              Here&apos;s an overview of your AI image editing workspace
             </p>
           </div>
 
@@ -190,7 +190,7 @@ export default function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Zap className="text-primary h-5 w-5" />
+                <Sparkles className="text-primary h-5 w-5" />
                 Quick Actions
               </CardTitle>
             </CardHeader>
@@ -263,14 +263,14 @@ export default function DashboardPage() {
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <div className="relative mb-4">
                     <div className="border-muted bg-muted/20 flex h-20 w-20 items-center justify-center rounded-full border-2 border-dashed">
-                      <Camera className="text-muted-foreground h-8 w-8" />
+                      <ImageIcon className="text-muted-foreground h-8 w-8" />
                     </div>
                   </div>
                   <h3 className="mb-2 text-lg font-semibold">
                     No projects yet
                   </h3>
                   <p className="text-muted-foreground mb-4 text-sm">
-                    Start creating amazing images with PixelPulse AI tools
+                    Start creating amazing images with AI tools
                   </p>
                   <Button
                     onClick={() => router.push("/dashboard/create")}
