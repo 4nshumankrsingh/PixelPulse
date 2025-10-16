@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Providers } from "~/components/providers";
-import { Sparkles, ImageIcon, Zap, Target } from "lucide-react";
+import { Camera, ImageIcon, Zap, Target } from "lucide-react";
 import Link from "next/link";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
@@ -14,7 +14,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             {/* Logo */}
             <Link href="/" className="mb-12 flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-blue-400/30 bg-blue-500/20 backdrop-blur-sm">
-                <Sparkles className="h-7 w-7 text-blue-300" />
+                <Camera className="h-7 w-7 text-blue-300" />
               </div>
               <span className="text-2xl font-bold text-blue-50">
                 PixelPulse
@@ -97,7 +97,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             <div className="mb-8 text-center lg:hidden">
               <Link href="/" className="inline-flex items-center gap-2">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg">
-                  <Sparkles className="h-6 w-6 text-white" />
+                  <Camera className="h-6 w-6 text-white" />
                 </div>
                 <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-xl font-bold text-transparent">
                   PixelPulse
