@@ -50,9 +50,14 @@ export const env = createEnv({
     NODE_ENV: normalize(process.env.NODE_ENV),
     BETTER_AUTH_SECRET: normalize(process.env.BETTER_AUTH_SECRET),
     // BETTER_AUTH_URL is required for production; provide a safe development fallback
-    BETTER_AUTH_URL: normalize(
-      process.env.BETTER_AUTH_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3055' : undefined)
-    ),
+    // Ensure the runtime value always includes a scheme so downstream libs (BetterAuth) get a valid base URL
+    BETTER_AUTH_URL: (() => {
+      const raw = process.env.BETTER_AUTH_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3055' : undefined);
+      const s = normalize(raw);
+      if (!s) return undefined;
+      if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(s)) return `https://${s}`;
+      return s;
+    })(),
     POLAR_ACCESS_TOKEN: normalize(process.env.POLAR_ACCESS_TOKEN),
     POLAR_WEBHOOK_SECRET: normalize(process.env.POLAR_WEBHOOK_SECRET),
     IMAGEKIT_PRIVATE_KEY: normalize(process.env.IMAGEKIT_PRIVATE_KEY),
