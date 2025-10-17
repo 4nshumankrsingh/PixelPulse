@@ -2,9 +2,9 @@
 import { env } from "../env.js";
 
 export const clientConfig = {
-  betterAuthUrl: env.NEXT_PUBLIC_BETTER_AUTH_URL || env.BETTER_AUTH_URL,
-  imagekitUrlEndpoint: env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT || env.IMAGEKIT_URL_ENDPOINT,
-  imagekitPublicKey: env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY || env.IMAGEKIT_PUBLIC_KEY,
+  betterAuthUrl: env.NEXT_PUBLIC_BETTER_AUTH_URL ?? env.BETTER_AUTH_URL,
+  imagekitUrlEndpoint: env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT ?? env.IMAGEKIT_URL_ENDPOINT,
+  imagekitPublicKey: env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY ?? env.IMAGEKIT_PUBLIC_KEY,
 } as const;
 
 // Validation for client-side environment variables
