@@ -21,23 +21,35 @@ export default function Upgrade() {
         credentials: 'include',
       });
 
-      const result = await response.json();
-      console.log("📦 API Response:", { status: response.status, result });
+      const raw: unknown = await response.json();
+      console.log("📦 API Response:", { status: response.status, raw });
+
+      function isCheckoutResponse(v: unknown): v is { url?: string; error?: string } {
+        return typeof v === 'object' && v !== null && ('url' in v || 'error' in v);
+      }
+
+      if (!isCheckoutResponse(raw)) {
+        console.error('❌ Unexpected API response', raw);
+        alert('Unable to process payment. Please try again.');
+        return;
+      }
+
+      const result = raw;
 
       if (response.ok && result.url) {
-        console.log("🔗 Redirecting to payment page...");
+        console.log('🔗 Redirecting to payment page...');
         window.location.href = result.url;
         return;
       }
 
       // Handle specific error cases
       if (response.status === 401) {
-        alert("🔐 Please sign in to purchase credits.");
+        alert('🔐 Please sign in to purchase credits.');
         return;
       }
 
-      console.error("❌ Checkout failed:", result.error);
-      alert(result.error || "Unable to process payment. Please try again.");
+      console.error('❌ Checkout failed:', result.error);
+      alert(result.error ?? 'Unable to process payment. Please try again.');
 
     } catch (error) {
       console.error("💥 Upgrade error:", error);

@@ -1,21 +1,37 @@
 // src/app/api/webhooks/polar/route.ts
-import { NextRequest, NextResponse } from "next/server";
+// Removed eslint-disable for explicit anys
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "~/server/db";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text();
-    const signature = request.headers.get('polar-signature');
+  const _signature = request.headers.get('polar-signature');
+  void _signature;
+  // mark as intentionally unused for now (signature verification not implemented)
+  void _signature;
 
     // In a real implementation, you would verify the webhook signature here
     // For now, we'll process the webhook directly
     
-    const event = JSON.parse(body);
-    console.log("📩 Polar webhook received:", event.type);
+    const event: unknown = JSON.parse(body);
+    // Minimal runtime guards for event shape
+    function isPolarEvent(v: unknown): v is { type?: string; data?: unknown } {
+      return typeof v === 'object' && v !== null && 'type' in v;
+    }
 
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data;
-      const customerEmail = session.customer_email;
+    if (!isPolarEvent(event)) {
+      console.error('❌ Webhook: unexpected payload', event);
+      return NextResponse.json({ error: 'Invalid webhook payload' }, { status: 400 });
+    }
+
+    const eventType = (event as Record<string, unknown>).type as string | undefined;
+    console.log('📩 Polar webhook received:', eventType);
+
+    if (eventType === 'checkout.session.completed') {
+      const session = (event as Record<string, unknown>).data as Record<string, unknown> | undefined;
+      const customerEmail = session?.customer_email as string | undefined;
       
       console.log("✅ Payment completed for:", customerEmail);
 
@@ -32,17 +48,26 @@ export async function POST(request: NextRequest) {
       // Calculate credits based on line items
       let totalCredits = 0;
       
-      if (session.line_items && Array.isArray(session.line_items)) {
-        for (const item of session.line_items) {
-          switch (item.price.id) {
+      if (session?.line_items && Array.isArray(session.line_items)) {
+        for (const rawItem of session.line_items as unknown[]) {
+          const item = rawItem as Record<string, unknown> | undefined;
+          const priceField = item?.price;
+          const priceId = (typeof (priceField as Record<string, unknown>)?.id === 'string' && (priceField as Record<string, unknown>).id) ??
+            (typeof priceField === 'string' ? priceField : undefined);
+          const qtyRaw = item?.quantity;
+          const parsedQty = typeof qtyRaw === 'number' ? qtyRaw : (typeof qtyRaw === 'string' ? Number(qtyRaw) : NaN);
+          const qty = Number.isFinite(parsedQty) ? parsedQty : 1;
+          switch (priceId) {
             case "08350901-0559-47e6-a007-8b8c6e291198": // Small Pack
-              totalCredits += 50 * (item.quantity || 1);
+              totalCredits += 50 * qty;
               break;
             case "9666ecc6-e2d0-481c-8c4e-317465269250": // Medium Pack
-              totalCredits += 200 * (item.quantity || 1);
+              totalCredits += 200 * qty;
               break;
             case "f8365395-9620-4667-8d47-1394f91da680": // Large Pack
-              totalCredits += 400 * (item.quantity || 1);
+              totalCredits += 400 * qty;
+              break;
+            default:
               break;
           }
         }

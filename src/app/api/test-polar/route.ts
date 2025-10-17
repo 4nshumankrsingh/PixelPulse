@@ -20,15 +20,16 @@ export async function GET() {
       accessTokenPresent: !!env.POLAR_ACCESS_TOKEN,
       accessTokenValid: env.POLAR_ACCESS_TOKEN?.startsWith('polar_'),
     });
-  } catch (error: any) {
-    console.error("❌ Polar test failed:", error);
-    
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("❌ Polar test failed:", msg);
+
     return NextResponse.json({
       status: "error",
-      message: error.message,
+      message: msg,
       accessToken: env.POLAR_ACCESS_TOKEN ? "Present" : "Missing",
       accessTokenStartsWithPolar: env.POLAR_ACCESS_TOKEN?.startsWith('polar_'),
-      accessTokenPreview: env.POLAR_ACCESS_TOKEN?.substring(0, 20) + '...',
+      accessTokenPreview: env.POLAR_ACCESS_TOKEN ? `${env.POLAR_ACCESS_TOKEN.substring(0, 20)}...` : undefined,
     }, { status: 500 });
   }
 }

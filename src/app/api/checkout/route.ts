@@ -2,7 +2,8 @@
 import { auth } from "~/lib/auth";
 import { Polar } from "@polar-sh/sdk";
 import { env } from "~/env";
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
     console.log("✅ User authenticated:", session.user.email);
 
     // Validate environment variables
-    if (!env.POLAR_ACCESS_TOKEN || !env.POLAR_ACCESS_TOKEN.startsWith('polar_')) {
+    if (!env.POLAR_ACCESS_TOKEN?.startsWith('polar_')) {
       console.error("❌ Invalid Polar access token");
       return NextResponse.json({ 
         error: "Payment configuration error" 
@@ -65,49 +66,37 @@ export async function POST(request: NextRequest) {
 
     console.log("🛒 Creating checkout with data:", checkoutData);
 
-    // Use type assertion to bypass TypeScript issues
-    const checkoutSession = await (polarClient.checkouts.create as any)(checkoutData);
+  // Call Polar SDK; narrow as unknown and safely extract the URL.
+  // Allow a small, localized use of `any` and unsafe-member access for SDK interop.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+  const rawCheckout = await (polarClient as any).checkouts.create(checkoutData) as unknown;
 
-    console.log("✅ Checkout session created:", checkoutSession.id);
-
-    if (!checkoutSession?.url) {
-      console.error("❌ No checkout URL in response:", checkoutSession);
-      return NextResponse.json({ 
-        error: "Failed to generate payment link" 
-      }, { status: 500 });
+    if (typeof rawCheckout !== 'object' || rawCheckout === null) {
+      console.error('❌ Unexpected checkout response:', rawCheckout);
+      return NextResponse.json({ error: 'Failed to generate payment link' }, { status: 500 });
     }
 
-    console.log("🔗 Checkout URL:", checkoutSession.url);
-    
-    return NextResponse.json({ 
-      success: true,
-      url: checkoutSession.url 
-    });
+  // Access the `url` field via a Record cast and perform a runtime check.
+  const maybeUrl = (rawCheckout as Record<string, unknown>).url;
+  const url = typeof maybeUrl === 'string' ? maybeUrl : undefined;
 
-  } catch (error: any) {
-    console.error("💥 Checkout API error:", error);
-    
-    // Log detailed error information
-    console.error("Error details:", {
-      message: error.message,
-      stack: error.stack,
-      response: error.response?.data,
-      status: error.response?.status,
-    });
-
-    // Provide specific error messages
-    let errorMessage = "Payment system temporarily unavailable";
-    
-    if (error.message?.includes("401") || error.response?.status === 401) {
-      errorMessage = "Invalid payment configuration. Please contact support.";
-    } else if (error.message?.includes("network") || error.message?.includes("fetch")) {
-      errorMessage = "Network error. Please check your connection.";
-    } else if (error.response?.data) {
-      errorMessage = `Payment error: ${JSON.stringify(error.response.data)}`;
+    if (!url) {
+      console.error('❌ No checkout URL in response:', rawCheckout);
+      return NextResponse.json({ error: 'Failed to generate payment link' }, { status: 500 });
     }
 
-    return NextResponse.json({ 
-      error: errorMessage 
-    }, { status: 500 });
+    console.log('🔗 Checkout URL:', url);
+    return NextResponse.json({ success: true, url });
+
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("💥 Checkout API error:", message);
+
+    const isAuthErr = message.includes("401");
+    const errorMessage = isAuthErr
+      ? "Invalid payment configuration. Please contact support."
+      : "Payment system temporarily unavailable";
+
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
