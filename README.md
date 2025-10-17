@@ -173,7 +173,7 @@ ImageKit powers our AI editing features:
 
 <div align="center">
 
-**PixelPulse - Transform Your Images with AI Power** ✨
+**PixelPulse - Transform Your Images with AI** ✨
 
 </div>
 
