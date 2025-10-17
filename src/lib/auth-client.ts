@@ -4,7 +4,7 @@ import { polarClient } from "@polar-sh/better-auth";
 
 // Create the auth client with polar plugin directly
 export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "http://localhost:3055",
+  baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL ?? "http://localhost:3055",
   plugins: [polarClient()],
 });
 

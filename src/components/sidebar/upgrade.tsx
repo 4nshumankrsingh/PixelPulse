@@ -28,15 +28,30 @@ export default function Upgrade() {
         }),
       });
 
-      const result = await response.json();
+  // Safely parse and validate the response JSON to avoid assigning `any`.
+  const raw: unknown = await response.json();
 
-      if (response.ok && result.url) {
-        console.log("Redirecting to checkout:", result.url);
-        // Redirect to Polar checkout
-        window.location.href = result.url;
+      function isCheckoutResponse(v: unknown): v is { url?: string; error?: string } {
+        return (
+          typeof v === "object" &&
+          v !== null &&
+          ("url" in v || "error" in v)
+        );
+      }
+
+      if (isCheckoutResponse(raw)) {
+        const result = raw;
+        if (response.ok && result.url) {
+          console.log("Redirecting to checkout:", result.url);
+          // Redirect to Polar checkout
+          window.location.href = result.url;
+        } else {
+          console.error("Checkout failed:", result.error);
+          alert(result.error ?? "Failed to start checkout process. Please try again.");
+        }
       } else {
-        console.error("Checkout failed:", result.error);
-        alert(result.error || "Failed to start checkout process. Please try again.");
+        console.error("Unexpected response from checkout API", raw);
+        alert("Failed to start checkout process. Please try again later.");
       }
     } catch (error) {
       console.error("Checkout error:", error);

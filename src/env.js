@@ -3,6 +3,10 @@ import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
 // Helper: normalize env values by trimming whitespace and removing surrounding single/double quotes
+/**
+ * @param {unknown} v
+ * @returns {string|undefined}
+ */
 const normalize = (v) => {
   if (v === undefined || v === null) return undefined;
   let s = String(v).trim();
