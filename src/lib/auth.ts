@@ -6,11 +6,11 @@ import { checkout, polar, portal, webhooks } from "@polar-sh/better-auth";
 import { db } from "~/server/db";
 
 // Initialize Polar client with error handling
-let polarClient;
+let polarClient: Polar | undefined;
 let polarEnabled = false;
 
 try {
-  if (env.POLAR_ACCESS_TOKEN && env.POLAR_ACCESS_TOKEN.startsWith('polar_')) {
+  if (env.POLAR_ACCESS_TOKEN?.startsWith('polar_')) {
     polarClient = new Polar({
       accessToken: env.POLAR_ACCESS_TOKEN,
       server: "sandbox", // Use "production" when you're ready for live payments
@@ -20,8 +20,8 @@ try {
   } else {
     console.log("⚠️ Polar disabled - invalid or missing access token");
   }
-} catch (error) {
-  console.log("⚠️ Polar disabled - initialization failed:", error);
+} catch (err) {
+  console.log("⚠️ Polar disabled - initialization failed:", err);
 }
 
 export const auth = betterAuth({

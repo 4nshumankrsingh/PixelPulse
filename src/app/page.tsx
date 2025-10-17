@@ -15,7 +15,6 @@ import {
   Users,
   Clock,
   Shield,
-  Sparkles,
   Upload,
   Wand2,
   FolderOpen,
