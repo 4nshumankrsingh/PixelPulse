@@ -1,3 +1,4 @@
+// src/lib/auth.ts
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { Polar } from "@polar-sh/sdk";
@@ -13,7 +14,7 @@ try {
   if (env.POLAR_ACCESS_TOKEN?.startsWith('polar_')) {
     polarClient = new Polar({
       accessToken: env.POLAR_ACCESS_TOKEN,
-      server: "sandbox", // Use "production" when you're ready for live payments
+      server: "sandbox",
     });
     polarEnabled = true;
     console.log("✅ Polar integration enabled");
@@ -45,7 +46,7 @@ export const auth = betterAuth({
   plugins: polarEnabled ? [
     polar({
       client: polarClient!,
-      createCustomerOnSignUp: false, // Set to false to prevent signup errors
+      createCustomerOnSignUp: false,
       use: [
         checkout({
           products: [
