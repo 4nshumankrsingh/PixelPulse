@@ -1,6 +1,6 @@
 "use server";
 
-import { UserButton } from "@daveyplate/better-auth-ui";
+import UserButtonClient from "./user-button-client";
 import {
   Sidebar,
   SidebarContent,
@@ -46,7 +46,7 @@ export async function AppSidebar() {
           <Credits />
           <Upgrade />
         </div>
-        <UserButton
+        <UserButtonClient
           variant="outline"
           className="border-muted-foreground/20 hover:border-primary/50 w-full transition-colors"
           disableDefaultLinks={true}
