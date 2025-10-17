@@ -13,26 +13,11 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <AuthUIProvider
       authClient={authClient}
-      navigate={(...args) => router.push(...args)}
-      replace={(...args) => router.replace(...args)}
-      onSessionChange={async () => {
-        // Clear router cache (protected routes)
+      navigate={(path) => router.push(path)}
+      replace={(path) => router.replace(path)}
+      onSessionChange={() => {
+        // Simple session change handler - refresh the page
         router.refresh();
-
-        // Check if user is authenticated and redirect to dashboard
-        try {
-          const session = await authClient.getSession();
-          if (session.data?.user && typeof window !== "undefined") {
-            const currentPath = window.location.pathname;
-            // Only redirect if we're on an auth page
-            if (currentPath.startsWith("/auth/")) {
-              router.push("/dashboard");
-            }
-          }
-        } catch (error) {
-          // Session check failed, user likely logged out
-          console.log("Session check failed:", error);
-        }
       }}
       Link={Link}
     >

@@ -12,6 +12,7 @@ import {
   Star,
   ArrowRight,
   Plus,
+  LogOut,
 } from "lucide-react";
 import { authClient } from "~/lib/auth-client";
 import { useEffect, useState } from "react";
@@ -48,6 +49,7 @@ export default function DashboardPage() {
     thisWeek: 0,
   });
   const [user, setUser] = useState<{ name?: string; createdAt?: string | Date } | null>(null);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -88,6 +90,33 @@ export default function DashboardPage() {
     void initializeDashboard();
   }, []);
 
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      console.log("Attempting sign out...");
+      
+      const result = await authClient.signOut();
+      console.log("Sign out result:", result);
+      
+      // Force a hard refresh to clear all client-side state
+      window.location.href = "/";
+      
+    } catch (error) {
+      console.error("Sign out failed:", error);
+      // Fallback: try the reset endpoint
+      try {
+        await fetch('/api/auth/reset', { method: 'POST' });
+        window.location.href = "/";
+      } catch (resetError) {
+        console.error("Reset also failed:", resetError);
+        // Last resort: hard redirect
+        window.location.href = "/";
+      }
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
@@ -106,14 +135,32 @@ export default function DashboardPage() {
       <RedirectToSignIn />
       <SignedIn>
         <div className="space-y-6">
-          {/* Header Section */}
-          <div className="space-y-2">
-            <h1 className="from-primary to-primary/70 bg-gradient-to-r bg-clip-text text-2xl font-bold tracking-tight text-transparent sm:text-3xl">
-              Welcome back{user?.name ? `, ${user.name}` : ""}!
-            </h1>
-            <p className="text-muted-foreground text-base sm:text-lg">
-              Here&apos;s an overview of your AI image editing workspace
-            </p>
+          {/* Header Section with Sign Out Button */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <h1 className="from-primary to-primary/70 bg-gradient-to-r bg-clip-text text-2xl font-bold tracking-tight text-transparent sm:text-3xl">
+                Welcome back{user?.name ? `, ${user.name}` : ""}!
+              </h1>
+              <p className="text-muted-foreground text-base sm:text-lg">
+                Here&apos;s an overview of your AI image editing workspace
+              </p>
+            </div>
+            
+            {/* Sign Out Button */}
+            <Button
+              onClick={handleSignOut}
+              disabled={isSigningOut}
+              variant="outline"
+              size="sm"
+              className="gap-2"
+            >
+              {isSigningOut ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <LogOut className="h-4 w-4" />
+              )}
+              Sign Out
+            </Button>
           </div>
 
           {/* Stats Cards */}

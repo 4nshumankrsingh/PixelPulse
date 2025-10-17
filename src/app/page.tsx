@@ -1,7 +1,7 @@
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import {
-  Sparkles,
+  Camera,
   Zap,
   Star,
   ArrowRight,
@@ -12,6 +12,13 @@ import {
   Download,
   CheckCircle2,
   Play,
+  Users,
+  Clock,
+  Shield,
+  Sparkles,
+  Upload,
+  Wand2,
+  FolderOpen,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -58,6 +65,7 @@ export default function HomePage() {
       content:
         "This tool has revolutionized my workflow. Background removal that used to take hours now takes seconds!",
       rating: 5,
+      avatar: "SC",
     },
     {
       name: "Marcus Johnson",
@@ -65,6 +73,7 @@ export default function HomePage() {
       content:
         "Perfect for product photography. The AI upscaling feature makes my images look professional.",
       rating: 5,
+      avatar: "MJ",
     },
     {
       name: "Emma Rodriguez",
@@ -72,6 +81,7 @@ export default function HomePage() {
       content:
         "The object cropping feature is incredible. It knows exactly what I want to focus on.",
       rating: 5,
+      avatar: "ER",
     },
   ];
 
@@ -84,6 +94,14 @@ export default function HomePage() {
     "Cloud Storage",
   ];
 
+  const stats = [
+    { icon: <ImageIcon className="h-6 w-6" />, value: "10K+", label: "Images Processed" },
+    { icon: <Users className="h-6 w-6" />, value: "2.5K+", label: "Active Users" },
+    { icon: <Shield className="h-6 w-6" />, value: "99.9%", label: "Uptime" },
+    { icon: <Star className="h-6 w-6" />, value: "4.8★", label: "User Rating" },
+    { icon: <Clock className="h-6 w-6" />, value: "24/7", label: "AI Processing" },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-slate-100">
       {/* Navigation */}
@@ -92,7 +110,7 @@ export default function HomePage() {
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg">
-                <Sparkles className="h-5 w-5 text-white" />
+                <Camera className="h-5 w-5 text-white" />
               </div>
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-xl font-bold text-transparent">
                 PixelPulse
@@ -127,7 +145,7 @@ export default function HomePage() {
                 </Button>
               </Link>
               <Link href="/dashboard">
-                <Button size="sm" className="cursor-pointer gap-2">
+                <Button size="sm" className="cursor-pointer gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
                   Try Free
                   <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -142,7 +160,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-4xl text-center">
             <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-blue-200/60 bg-blue-100/30 px-4 py-2 text-sm">
-              <Sparkles className="h-4 w-4 text-blue-600" />
+              <Zap className="h-4 w-4 text-blue-600" />
               <span className="font-medium text-blue-700">
                 Powered by Advanced AI
               </span>
@@ -165,7 +183,7 @@ export default function HomePage() {
               <Link href="/dashboard">
                 <Button
                   size="lg"
-                  className="cursor-pointer gap-2 px-8 py-6 text-base"
+                  className="cursor-pointer gap-2 px-8 py-6 text-base bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
                 >
                   <Play className="h-5 w-5" />
                   Try It Free Now
@@ -175,7 +193,7 @@ export default function HomePage() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="cursor-pointer gap-2 px-8 py-6 text-base"
+                  className="cursor-pointer gap-2 px-8 py-6 text-base border-slate-300 text-slate-700 hover:bg-slate-100"
                 >
                   <ImageIcon className="h-5 w-5" />
                   View Demo
@@ -183,31 +201,26 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="mt-16 text-center">
+            <div className="mt-16">
               <p className="mb-8 text-sm text-slate-500">
                 Trusted by thousands of creators worldwide
               </p>
-              <div className="grid grid-cols-2 items-center justify-center gap-6 opacity-80 sm:grid-cols-5">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-slate-700">10K+</div>
-                  <div className="text-xs text-slate-500">Images Processed</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-slate-700">2.5K+</div>
-                  <div className="text-xs text-slate-500">Active Users</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-slate-700">99.9%</div>
-                  <div className="text-xs text-slate-500">Uptime</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-amber-600">4.8★</div>
-                  <div className="text-xs text-slate-500">User Rating</div>
-                </div>
-                <div className="col-span-2 text-center sm:col-span-1">
-                  <div className="text-2xl font-bold text-slate-700">24/7</div>
-                  <div className="text-xs text-slate-500">AI Processing</div>
-                </div>
+              <div className="grid grid-cols-2 gap-6 opacity-80 sm:grid-cols-5">
+                {stats.map((stat, index) => (
+                  <div key={index} className="flex flex-col items-center gap-2">
+                    <div className="flex items-center gap-2">
+                      <div className="text-blue-600">
+                        {stat.icon}
+                      </div>
+                      <div className="text-2xl font-bold text-slate-700">
+                        {stat.value}
+                      </div>
+                    </div>
+                    <div className="text-xs text-slate-500 text-center">
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -234,11 +247,11 @@ export default function HomePage() {
             {features.map((feature, index) => (
               <Card
                 key={index}
-                className="group relative overflow-hidden border-slate-200 bg-white/70 backdrop-blur-sm transition-all hover:shadow-lg"
+                className="group relative overflow-hidden border-slate-200 bg-white/70 backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
               >
                 <CardContent className="p-6">
                   <div
-                    className={`${feature.bgColor} mb-4 inline-flex items-center justify-center rounded-lg p-3 ${feature.color}`}
+                    className={`${feature.bgColor} mb-4 inline-flex items-center justify-center rounded-xl p-3 ${feature.color} transition-transform duration-300 group-hover:scale-110`}
                   >
                     {feature.icon}
                   </div>
@@ -249,7 +262,7 @@ export default function HomePage() {
                     {feature.description}
                   </p>
                 </CardContent>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 to-blue-500/5 opacity-0 transition-opacity group-hover:opacity-100" />
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 to-purple-500/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
               </Card>
             ))}
           </div>
@@ -272,36 +285,39 @@ export default function HomePage() {
             {[
               {
                 step: "01",
+                icon: <Upload className="h-6 w-6" />,
                 title: "Upload Your Image",
                 description:
                   "Drag and drop or select your image. We support all major formats including JPG, PNG, and WebP.",
               },
               {
                 step: "02",
+                icon: <Wand2 className="h-6 w-6" />,
                 title: "Choose AI Tools",
                 description:
                   "Select from our powerful AI tools: background removal, upscaling, or object-focused cropping.",
               },
               {
                 step: "03",
+                icon: <Download className="h-6 w-6" />,
                 title: "Download Results",
                 description:
                   "Get your professionally edited image in seconds. High-quality results ready for any use.",
               },
             ].map((item, index) => (
-              <div key={index} className="relative">
-                <div className="mb-4 flex items-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-lg font-bold text-white shadow-lg">
+              <div key={index} className="relative text-center">
+                <div className="mb-6 flex flex-col items-center">
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg">
+                    {item.icon}
+                  </div>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 text-sm font-bold text-slate-600">
                     {item.step}
                   </div>
-                  {index < 2 && (
-                    <div className="ml-4 hidden h-0.5 w-full bg-slate-300 md:block" />
-                  )}
                 </div>
-                <h3 className="mb-2 text-xl font-semibold text-slate-800">
+                <h3 className="mb-3 text-xl font-semibold text-slate-800">
                   {item.title}
                 </h3>
-                <p className="text-slate-600">{item.description}</p>
+                <p className="text-slate-600 leading-relaxed">{item.description}</p>
               </div>
             ))}
           </div>
@@ -327,26 +343,31 @@ export default function HomePage() {
             {testimonials.map((testimonial, index) => (
               <Card
                 key={index}
-                className="relative border-slate-200 bg-white/70 backdrop-blur-sm"
+                className="group relative border-slate-200 bg-white/70 backdrop-blur-sm transition-all duration-300 hover:shadow-lg"
               >
                 <CardContent className="p-6">
                   <div className="mb-4 flex items-center gap-1">
-                    {Array.from({ length: Number(testimonial.rating) }).map((_, i) => (
+                    {Array.from({ length: testimonial.rating }).map((_, i) => (
                       <Star
                         key={i}
                         className="h-4 w-4 fill-amber-400 text-amber-400"
                       />
                     ))}
                   </div>
-                  <p className="mb-4 text-slate-600 italic">
+                  <p className="mb-6 text-slate-600 italic leading-relaxed">
                     &ldquo;{testimonial.content}&rdquo;
                   </p>
-                  <div>
-                    <div className="font-semibold text-slate-800">
-                      {testimonial.name}
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600 font-semibold text-white">
+                      {testimonial.avatar}
                     </div>
-                    <div className="text-sm text-slate-500">
-                      {testimonial.role}
+                    <div>
+                      <div className="font-semibold text-slate-800">
+                        {testimonial.name}
+                      </div>
+                      <div className="text-sm text-slate-500">
+                        {testimonial.role}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -375,12 +396,17 @@ export default function HomePage() {
           </div>
 
           <div className="mx-auto max-w-lg">
-            <Card className="relative overflow-hidden border-2 border-blue-300 bg-white/70 backdrop-blur-sm">
-              <div className="absolute top-0 right-0 bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-1 text-sm font-medium text-white">
+            <Card className="relative overflow-hidden border-2 border-blue-300 bg-white/70 backdrop-blur-sm transition-all duration-300 hover:shadow-xl">
+              <div className="absolute top-0 right-0 bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-2 text-sm font-medium text-white rounded-bl-lg">
                 Free to Start
               </div>
               <CardContent className="p-8">
                 <div className="mb-8 text-center">
+                  <div className="mb-4 flex justify-center">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600">
+                      <FolderOpen className="h-8 w-8 text-white" />
+                    </div>
+                  </div>
                   <h3 className="text-2xl font-bold text-slate-800">
                     Free Plan
                   </h3>
@@ -406,11 +432,11 @@ export default function HomePage() {
 
                 <Link href="/dashboard">
                   <Button
-                    className="w-full cursor-pointer gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                    className="w-full cursor-pointer gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 py-6 text-base"
                     size="lg"
                   >
-                    <Sparkles className="h-4 w-4" />
-                    Try It Free Now
+                    <Zap className="h-5 w-5" />
+                    Get Started Free
                   </Button>
                 </Link>
 
@@ -440,8 +466,8 @@ export default function HomePage() {
                   size="lg"
                   className="cursor-pointer gap-2 bg-gradient-to-r from-blue-500 to-purple-600 px-8 py-6 text-base hover:from-blue-600 hover:to-purple-700"
                 >
-                  <Sparkles className="h-5 w-5" />
-                  Try It Free Now
+                  <Camera className="h-5 w-5" />
+                  Start Creating Now
                 </Button>
               </Link>
               <Link href="/dashboard">
@@ -450,7 +476,7 @@ export default function HomePage() {
                   size="lg"
                   className="cursor-pointer gap-2 border-slate-300 px-8 py-6 text-base text-slate-700 hover:bg-slate-100"
                 >
-                  <Download className="h-5 w-5" />
+                  <ImageIcon className="h-5 w-5" />
                   View Examples
                 </Button>
               </Link>
@@ -467,7 +493,7 @@ export default function HomePage() {
               <div className="md:col-span-2">
                 <div className="mb-4 flex items-center gap-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg">
-                    <Sparkles className="h-5 w-5 text-white" />
+                    <Camera className="h-5 w-5 text-white" />
                   </div>
                   <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-xl font-bold text-transparent">
                     PixelPulse
