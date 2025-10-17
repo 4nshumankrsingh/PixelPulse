@@ -1,8 +1,8 @@
-# PixelPulse - AI Image Editor SaaS 📷
+# PixelPulse - AI Image Editor SaaS 🚀
 
 <div align="center">
 
-https:///public/home-page-screenshot.png
+![PixelPulse Home Page](/public/home-page-screenshot.png)
 
 *The ultimate AI Image Editor SaaS application leveraging cutting-edge technologies*
 
@@ -94,6 +94,7 @@ PixelPulse is a comprehensive AI-powered image editing SaaS platform built with 
 
 ### Deployment
 - **Vercel** - Serverless deployment platform
+
 
 ## 🚀 Getting Started
 
