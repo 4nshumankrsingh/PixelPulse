@@ -1,4 +1,4 @@
-# PixelPulse - AI Image Editor SaaS 🚀
+# PixelPulse - AI Image Editor SaaS 📷
 
 <div align="center">
 
