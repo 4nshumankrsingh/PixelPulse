@@ -11,51 +11,37 @@ export default function Upgrade() {
   const upgrade = async () => {
     setIsLoading(true);
     try {
-      console.log("Starting checkout process...");
+      console.log("🔼 Starting upgrade process...");
       
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // Important for sending cookies
-        body: JSON.stringify({
-          products: [
-            "08350901-0559-47e6-a007-8b8c6e291198",
-            "9666ecc6-e2d0-481c-8c4e-317465269250",
-            "f8365395-9620-4667-8d47-1394f91da680",
-          ],
-        }),
+        credentials: 'include',
       });
 
-  // Safely parse and validate the response JSON to avoid assigning `any`.
-  const raw: unknown = await response.json();
+      const result = await response.json();
+      console.log("📦 API Response:", { status: response.status, result });
 
-      function isCheckoutResponse(v: unknown): v is { url?: string; error?: string } {
-        return (
-          typeof v === "object" &&
-          v !== null &&
-          ("url" in v || "error" in v)
-        );
+      if (response.ok && result.url) {
+        console.log("🔗 Redirecting to payment page...");
+        window.location.href = result.url;
+        return;
       }
 
-      if (isCheckoutResponse(raw)) {
-        const result = raw;
-        if (response.ok && result.url) {
-          console.log("Redirecting to checkout:", result.url);
-          // Redirect to Polar checkout
-          window.location.href = result.url;
-        } else {
-          console.error("Checkout failed:", result.error);
-          alert(result.error ?? "Failed to start checkout process. Please try again.");
-        }
-      } else {
-        console.error("Unexpected response from checkout API", raw);
-        alert("Failed to start checkout process. Please try again later.");
+      // Handle specific error cases
+      if (response.status === 401) {
+        alert("🔐 Please sign in to purchase credits.");
+        return;
       }
+
+      console.error("❌ Checkout failed:", result.error);
+      alert(result.error || "Unable to process payment. Please try again.");
+
     } catch (error) {
-      console.error("Checkout error:", error);
-      alert("Failed to start checkout. Please check your connection and try again.");
+      console.error("💥 Upgrade error:", error);
+      alert("🌐 Network error. Please check your connection and try again.");
     } finally {
       setIsLoading(false);
     }
@@ -72,7 +58,7 @@ export default function Upgrade() {
       <div className="flex items-center gap-2">
         <Crown className="h-4 w-4 transition-transform duration-300 group-hover:rotate-12" />
         <span className="font-medium">
-          {isLoading ? "Loading..." : "Upgrade"}
+          {isLoading ? "Processing..." : "Upgrade"}
         </span>
         <Zap className="h-3 w-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       </div>

@@ -1,51 +1,113 @@
-// src/app/api/checkout/route.ts - Simplified version
+// src/app/api/checkout/route.ts
 import { auth } from "~/lib/auth";
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
-
-type PolarAuth = {
-  polar?: {
-    checkout: (opts: { body: { products: string[] } }) => Promise<{ url?: string }>;
-  };
-};
+import { Polar } from "@polar-sh/sdk";
+import { env } from "~/env";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
+    console.log("🏁 Checkout API called");
+
+    // Get session to verify user is authenticated
     const session = await auth.api.getSession({
       headers: request.headers,
     });
 
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user?.email) {
+      console.error("❌ No authenticated user found");
+      return NextResponse.json({ 
+        error: "Please sign in to purchase credits" 
+      }, { status: 401 });
     }
 
-    const authWithPolar = auth as unknown as PolarAuth;
+    console.log("✅ User authenticated:", session.user.email);
 
-    if (!authWithPolar.polar) {
-      throw new Error("Polar plugin not initialized");
+    // Validate environment variables
+    if (!env.POLAR_ACCESS_TOKEN || !env.POLAR_ACCESS_TOKEN.startsWith('polar_')) {
+      console.error("❌ Invalid Polar access token");
+      return NextResponse.json({ 
+        error: "Payment configuration error" 
+      }, { status: 500 });
     }
 
-    const checkoutResult = await authWithPolar.polar.checkout({
-      body: {
-        products: [
-          "08350901-0559-47e6-a007-8b8c6e291198",
-          "9666ecc6-e2d0-481c-8c4e-317465269250",
-          "f8365395-9620-4667-8d47-1394f91da680",
-        ],
-      },
+    // Initialize Polar client
+    const polarClient = new Polar({
+      accessToken: env.POLAR_ACCESS_TOKEN,
+      server: "sandbox",
     });
 
-    if (!checkoutResult?.url) {
-      return NextResponse.json({ error: "Checkout URL not generated" }, { status: 500 });
+    console.log("✅ Polar client initialized");
+
+    // Create checkout session
+    const checkoutData = {
+      lineItems: [
+        {
+          price: "08350901-0559-47e6-a007-8b8c6e291198", // Small Pack
+          quantity: 1,
+        },
+        {
+          price: "9666ecc6-e2d0-481c-8c4e-317465269250", // Medium Pack  
+          quantity: 1,
+        },
+        {
+          price: "f8365395-9620-4667-8d47-1394f91da680", // Large Pack
+          quantity: 1,
+        },
+      ],
+      customerEmail: session.user.email,
+      successUrl: `${env.BETTER_AUTH_URL}/dashboard?success=true`,
+      cancelUrl: `${env.BETTER_AUTH_URL}/dashboard?canceled=true`,
+      metadata: {
+        source: "pixelpulse-app",
+        userId: session.user.id,
+      },
+    };
+
+    console.log("🛒 Creating checkout with data:", checkoutData);
+
+    // Use type assertion to bypass TypeScript issues
+    const checkoutSession = await (polarClient.checkouts.create as any)(checkoutData);
+
+    console.log("✅ Checkout session created:", checkoutSession.id);
+
+    if (!checkoutSession?.url) {
+      console.error("❌ No checkout URL in response:", checkoutSession);
+      return NextResponse.json({ 
+        error: "Failed to generate payment link" 
+      }, { status: 500 });
     }
 
-    return NextResponse.json({ url: checkoutResult.url });
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : String(error);
-    console.error("Checkout API error:", msg);
-    return NextResponse.json(
-      { error: msg || "Internal server error" },
-      { status: 500 },
-    );
+    console.log("🔗 Checkout URL:", checkoutSession.url);
+    
+    return NextResponse.json({ 
+      success: true,
+      url: checkoutSession.url 
+    });
+
+  } catch (error: any) {
+    console.error("💥 Checkout API error:", error);
+    
+    // Log detailed error information
+    console.error("Error details:", {
+      message: error.message,
+      stack: error.stack,
+      response: error.response?.data,
+      status: error.response?.status,
+    });
+
+    // Provide specific error messages
+    let errorMessage = "Payment system temporarily unavailable";
+    
+    if (error.message?.includes("401") || error.response?.status === 401) {
+      errorMessage = "Invalid payment configuration. Please contact support.";
+    } else if (error.message?.includes("network") || error.message?.includes("fetch")) {
+      errorMessage = "Network error. Please check your connection.";
+    } else if (error.response?.data) {
+      errorMessage = `Payment error: ${JSON.stringify(error.response.data)}`;
+    }
+
+    return NextResponse.json({ 
+      error: errorMessage 
+    }, { status: 500 });
   }
 }
